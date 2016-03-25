@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+     "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>${project.title}</title>
+		<!-- standard meta data -->
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="author" content="Holger Machens">
+		<meta name="date" content="${system.datetime}">
+		<!-- meta data for search engines -->
+		<meta name="description" content="${project.description}">
+		<meta name="keywords" lang="en" content="${project.keywords}">
+		<!-- meta name="robots" content="noindex,nofollow"-->
+	</head>
+	<body>
+		<h1 style="text-align: center">${project.title}</h1>
+		<p style="text-align: center">${project.description}</p>
+		<p style="text-align: center">(free and open source)</p>
+		<p style="text-align: center">Version ${project.version}<br/></p> 
+		<p style="text-align: center" >${system.date}</p>
+		<p style="text-align: center"><a href="${project.downloads.binary}">download</a></p>
+		<p style="text-align: center"><a href="${project.downloads.source}">program source</a></p>
+
+	<br/>
+	<p>Open Minecraft Launcher is a framework to create custom launchers for Minecraft mod-packs. 
+	It provides several sub-systems to safely control and execute tasks such as
+	</p>
+	<ul>
+	<li>Installation/configuration and launch of a Minecraft client</li>
+	<li>Installation of Forge</li>
+	<li>Installation and automated update of Minecraft mods and mod-packs</li>
+	</ul>
+	<h2>Feature List</h2>
+	<dl>
+	<dt>Minecraft and Forge Setup Services</dt>
+	<dd>Behind the scenes Open MCL uses the original Minecraft Launcher and Forge installer to 
+	always run the appropriate installation procedure required by Minecraft or Forge.
+	Both plugins (jars) are dynamically linked on demand and not bundled with Open MCL.</dd>
+	
+	<dt>Software Dependency Management</dt>
+	<dd>Each software asset to be installed or updated is defined by a package 
+	descriptor. This package descriptor contains general information such as package name, 
+	version, download URL, checksum and dependencies to other required or optional packages. All 
+	package descriptors are maintained in a package repository (a set of folders and plain-text files).</dd>
+	
+	<dt>Internal/External Download</dt>
+	<dd>All downloads are routed through the download manager, which takes care of package 
+	integrity and timeouts. Besides direct download links, package descriptors can also 
+	refer to an advertising page in its	download URL. That means, that the actual download 
+	has to be performed manually by the user in his/her external system web browser. The 
+	download manager detects it and triggers a user interface to delegate the download task. 
+	</dd>
+	
+	<dt>Automated Updates</dt>
+	<dd>The update server is simply an HTTP server providing the content of the package 
+	    repository for download in some location. The update server component supports 
+	    server side locking and transactions which allow for safe modifications to the 
+	    package repository without shutting down the server. </dd>
+	
+	<dt>Persistent Tasks</dt>
+	<dd>A lot of tasks during installation of software are usually prone to inconsistencies when 
+	    interrupted. Hence, all installation tasks are persistently stored
+		in a database and can be restarted after system crashes or suspension. 
+		Once finished, a task gets removed from the data base.</dd>
+
+	<dt>Configuration</dt>
+	<dd>Open MCL includes tools to access and modify several different 
+	    configuration file formats in Minecraft installations such as NBT (using <a href="http://sourceforge.net/projects/jnbt/">jnbt</a>) 
+	    and name-value list based on either "name:value" or "name=value" scheme.</dd>
+	</dl>
+	
+	<h2>License: GPL v3</h2>
+	<h2>Prerequisites for Developers</h2>
+	<ul>
+	<li><a href="http://java.oracle.com">Java SE 1.8</a></li>
+	<li><a href="http://homac.cakelab.org/projects/org.cakelab.json">org.cakelab.json</a></li>
+	</ul>
+
+
+	</body>
+</html>
