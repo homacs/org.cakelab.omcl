@@ -421,7 +421,7 @@ public class FileSystem {
 		File dir = wd;
 		while (!dir.exists() && dir.getParentFile() != null) dir = dir.getParentFile();
 		
-		return dir.canExecute() && dir.canRead() && dir.canWrite();
+		return Files.isExecutable(dir.toPath()) && Files.isReadable(dir.toPath()) && Files.isWritable(dir.toPath());
 	}
 	public static boolean isChildOf(File child, File potentialParent) {
 		String standardizedChild = FileSystem.getStandardisedPath(child);
