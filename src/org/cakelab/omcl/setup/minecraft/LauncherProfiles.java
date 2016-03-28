@@ -218,8 +218,6 @@ public class LauncherProfiles {
 		String dir = p.getGameDir("pr0t0z0rq");
 		System.out.println("dir: " + dir);
 		
-		String javaArgs = p.getJavaArgs("pr0t0z0rq");
-
 		System.out.println(p);
 		
 	}

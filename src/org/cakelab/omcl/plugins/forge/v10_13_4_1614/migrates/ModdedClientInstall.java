@@ -1,4 +1,4 @@
-package org.cakelab.omcl.plugins.forge.migrates;
+package org.cakelab.omcl.plugins.forge.v10_13_4_1614.migrates;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
@@ -14,6 +14,14 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+
+import javax.swing.JOptionPane;
+
+import net.minecraftforge.installer.Artifact;
+import net.minecraftforge.installer.DownloadUtils;
+import net.minecraftforge.installer.IMonitor;
+import net.minecraftforge.installer.MirrorData;
+import net.minecraftforge.installer.VersionInfo;
 
 import org.cakelab.omcl.plugins.interfaces.ServicesListener;
 
@@ -33,16 +41,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 
-import cpw.mods.fml.installer.DownloadUtils;
-import cpw.mods.fml.installer.IMonitor;
-import cpw.mods.fml.installer.MirrorData;
-import cpw.mods.fml.installer.VersionInfo;
-
 public class ModdedClientInstall {
 	private static final Charset PROFILES_CHARSET = Charset.defaultCharset();
-	private List<String> grabbed;
+	private List<Artifact> grabbed;
 	private ServicesListener listener;
-	private File clientJarFile;
 
 	public boolean run(File target, final ServicesListener listener) {
 		this.listener = listener;
@@ -75,26 +77,7 @@ public class ModdedClientInstall {
 			}
 		}
 
-		File versionJsonFile = new File(versionTarget,
-				VersionInfo.getVersionTarget() + ".json");
-		clientJarFile = new File(versionTarget,
-				VersionInfo.getVersionTarget() + ".jar");
-		File minecraftJarFile = VersionInfo.getMinecraftFile(versionRootDir);
-		try {
-			if (VersionInfo.getStripMetaInf()) {
-				copyAndStrip(minecraftJarFile, clientJarFile);
-			} else {
-				Files.copy(minecraftJarFile, clientJarFile);
-			}
-		} catch (IOException e1) {
-			showForgeError(
-					"You need to run the version "
-							+ VersionInfo.getMinecraftVersion()
-							+ " manually at least once", "Error");
-			return false;
-		}
 		File librariesDir = new File(target, "libraries");
-		File targetLibraryFile = VersionInfo.getLibraryPath(librariesDir);
 
 		IMonitor monitor = new IMonitor() {
 			int max = 0;
@@ -122,21 +105,92 @@ public class ModdedClientInstall {
 			}
 
 		};
-
 		List<JsonNode> libraries = VersionInfo.getVersionInfo().getArrayNode(
 				new Object[] { "libraries" });
-		monitor.setMaximum(libraries.size() + 2);
-		int progress = 2;
+		monitor.setMaximum(libraries.size() + 3);
+		int progress = 3;
+
+		File versionJsonFile = new File(versionTarget,
+				VersionInfo.getVersionTarget() + ".json");
+
+
+		if (!VersionInfo.isInheritedJson()) {
+			File clientJarFile = new File(versionTarget,
+					VersionInfo.getVersionTarget() + ".jar");
+			File minecraftJarFile = VersionInfo
+					.getMinecraftFile(versionRootDir);
+
+			try {
+				boolean delete = false;
+				monitor.setNote("Considering minecraft client jar");
+				monitor.setProgress(1);
+
+				if (!minecraftJarFile.exists()) {
+					minecraftJarFile = File.createTempFile("minecraft_client",
+							".jar");
+					delete = true;
+					monitor.setNote(String.format(
+							"Downloading minecraft client version %s",
+							new Object[] { VersionInfo.getMinecraftVersion() }));
+					String clientUrl = String.format(
+							"https://s3.amazonaws.com/Minecraft.Download/versions/{MCVER}/{MCVER}.jar"
+									.replace("{MCVER}",
+											VersionInfo.getMinecraftVersion()),
+							new Object[0]);
+					System.out.println("  Temp File: "
+							+ minecraftJarFile.getAbsolutePath());
+
+					if (!DownloadUtils.downloadFileEtag("minecraft server",
+							minecraftJarFile, clientUrl)) {
+						minecraftJarFile.delete();
+						JOptionPane
+								.showMessageDialog(
+										null,
+										"Downloading minecraft failed, invalid e-tag checksum.\nTry again, or use the official launcher to run Minecraft "
+												+ VersionInfo
+														.getMinecraftVersion()
+												+ " first.",
+										"Error downloading", 0);
+
+						return false;
+					}
+					monitor.setProgress(2);
+				}
+
+				if (VersionInfo.getStripMetaInf()) {
+					monitor.setNote("Copying and filtering minecraft client jar");
+					copyAndStrip(minecraftJarFile, clientJarFile);
+					monitor.setProgress(3);
+				} else {
+					monitor.setNote("Copying minecraft client jar");
+					Files.copy(minecraftJarFile, clientJarFile);
+					monitor.setProgress(3);
+				}
+
+				if (delete) {
+					minecraftJarFile.delete();
+				}
+			} catch (IOException e1) {
+				JOptionPane.showMessageDialog(
+						null,
+						"You need to run the version "
+								+ VersionInfo.getMinecraftVersion()
+								+ " manually at least once", "Error", 0);
+				return false;
+			}
+		}
+
+		File targetLibraryFile = VersionInfo.getLibraryPath(librariesDir);
 		grabbed = Lists.newArrayList();
-		List<String> bad = Lists.newArrayList();
+		List<Artifact> bad = Lists.newArrayList();
 		progress = DownloadUtils.downloadInstalledLibraries("clientreq",
 				librariesDir, monitor, libraries, progress, grabbed, bad);
 
 		monitor.close();
 		if (bad.size() > 0) {
-			String list = Joiner.on(", ").join(bad);
-			showForgeError("These libraries failed to download. Try again.\n"
-					+ list, "Error downloading");
+			String list = Joiner.on("\n").join(bad);
+			showForgeError("These libraries failed to download. Try again.\n" + list,
+					"Error downloading");
 			return false;
 		}
 
@@ -193,21 +247,32 @@ public class ModdedClientInstall {
 			throw Throwables.propagate(e);
 		}
 
-		JsonField[] fields = {
-				JsonNodeFactories.field("name",
-						JsonNodeFactories.string(VersionInfo.getProfileName())),
-				JsonNodeFactories.field("lastVersionId", JsonNodeFactories
-						.string(VersionInfo.getVersionTarget())) };
-
 		HashMap<JsonStringNode, JsonNode> profileCopy = Maps
 				.newHashMap(jsonProfileData
 						.getNode(new Object[] { "profiles" }).getFields());
 		HashMap<JsonStringNode, JsonNode> rootCopy = Maps
 				.newHashMap(jsonProfileData.getFields());
-		profileCopy.put(JsonNodeFactories.string(VersionInfo.getProfileName()),
-				JsonNodeFactories.object(fields));
-		JsonRootNode profileJsonCopy = JsonNodeFactories.object(profileCopy);
+		if (profileCopy.containsKey(JsonNodeFactories.string(VersionInfo
+				.getProfileName()))) {
+			HashMap<JsonStringNode, JsonNode> forgeProfileCopy = Maps
+					.newHashMap(((JsonNode) profileCopy.get(JsonNodeFactories
+							.string(VersionInfo.getProfileName()))).getFields());
+			forgeProfileCopy.put(JsonNodeFactories.string("name"),
+					JsonNodeFactories.string(VersionInfo.getProfileName()));
+			forgeProfileCopy.put(JsonNodeFactories.string("lastVersionId"),
+					JsonNodeFactories.string(VersionInfo.getVersionTarget()));
+		} else {
+			JsonField[] fields = {
+					JsonNodeFactories.field("name", JsonNodeFactories
+							.string(VersionInfo.getProfileName())),
+					JsonNodeFactories.field("lastVersionId", JsonNodeFactories
+							.string(VersionInfo.getVersionTarget())) };
 
+			profileCopy.put(
+					JsonNodeFactories.string(VersionInfo.getProfileName()),
+					JsonNodeFactories.object(fields));
+		}
+		JsonRootNode profileJsonCopy = JsonNodeFactories.object(profileCopy);
 		rootCopy.put(JsonNodeFactories.string("profiles"), profileJsonCopy);
 
 		jsonProfileData = JsonNodeFactories.object(rootCopy);
@@ -224,6 +289,7 @@ public class ModdedClientInstall {
 					"Error");
 			return false;
 		}
+
 		File successIndicator = new File(versionTarget, ".success");
 		try {
 			successIndicator.createNewFile();
@@ -296,11 +362,17 @@ public class ModdedClientInstall {
 	}
 
 	public String getSuccessMessage() {
+		if (grabbed.size() > 0) {
+			return String
+					.format("Successfully installed client profile %s for version %s into launcher and grabbed %d required libraries",
+							new Object[] { VersionInfo.getProfileName(),
+									VersionInfo.getVersion(),
+									Integer.valueOf(grabbed.size()) });
+		}
 		return String
-				.format("Successfully installed client profile %s for version %s into launcher and grabbed %d required libraries",
+				.format("Successfully installed client profile %s for version %s into launcher",
 						new Object[] { VersionInfo.getProfileName(),
-								VersionInfo.getVersion(),
-								Integer.valueOf(grabbed.size()) });
+								VersionInfo.getVersion() });
 	}
 
 	public String getSponsorMessage() {

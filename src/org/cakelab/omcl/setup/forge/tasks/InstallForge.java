@@ -19,9 +19,11 @@ public class InstallForge extends RunnableTask {
 	private String workingDir;
 	private String installer;
 	private String mcVersion;
+	private String forgeVersion;
 
-	public InstallForge(File installerJar, File workingDir, String mcVersion) {
+	public InstallForge(File installerJar, String forgeVersion, File workingDir, String mcVersion) {
 		super("installation of forge", "installing forge");
+		this.forgeVersion = forgeVersion;
 		this.mcVersion = mcVersion;
 		this.workingDir = workingDir.getAbsolutePath();
 		this.installer = installerJar.getAbsolutePath();
@@ -100,7 +102,7 @@ public class InstallForge extends RunnableTask {
 		//
 		// now we can install forge.
 		//
-		ForgeServicesStub forge = ForgeServicesStub.create(new File(this.installer), PluginServices.getListener());
+		ForgeServicesStub forge = ForgeServicesStub.create(new File(this.installer), forgeVersion, PluginServices.getListener());
 		boolean success = forge.installClient(new File(this.workingDir));
 		if (!success) {
 			throw new RuntimeException("Forge installation failed.");
