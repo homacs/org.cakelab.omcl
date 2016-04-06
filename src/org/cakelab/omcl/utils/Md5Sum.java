@@ -16,7 +16,7 @@ import org.cakelab.omcl.utils.log.Log;
 
 public class Md5Sum {
 
-	public Md5Sum() {
+	private Md5Sum() {
 	}
 
 	
