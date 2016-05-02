@@ -315,19 +315,23 @@ public class ModdedBootstrap extends JFrame {
 			target.createNewFile();
 		}
 
-		FileChannel sourceChannel = null;
-		FileChannel targetChannel = null;
+		FileInputStream in = null;
+		FileOutputStream out = null;
 		try {
-			sourceChannel = new FileInputStream(source).getChannel();
-			targetChannel = new FileOutputStream(target).getChannel();
+			in = new FileInputStream(source);
+			out = new FileOutputStream(target);
+			FileChannel sourceChannel = null;
+			FileChannel targetChannel = null;
+			sourceChannel = in.getChannel();
+			targetChannel = out.getChannel();
 			targetChannel.transferFrom(sourceChannel, 0L, sourceChannel.size());
 		} finally {
-			if (sourceChannel != null) {
-				sourceChannel.close();
+			if (in != null) {
+				in.close();
 			}
 
-			if (targetChannel != null) {
-				targetChannel.close();
+			if (out != null) {
+				out.close();
 			}
 		}
 	}
