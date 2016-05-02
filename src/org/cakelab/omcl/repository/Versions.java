@@ -14,7 +14,7 @@ import org.cakelab.json.codec.JSONCodecException;
 import org.cakelab.omcl.utils.json.JsonSaveable;
 
 public class Versions implements JsonSaveable {
-	public static String FILENAME = "versions.json";
+	public static final String FILENAME = "versions.json";
 	private static JSONCodecConfiguration jsonConfig = new JSONCodecConfiguration(Charset.defaultCharset(), true, true);
 	
 	int latest;
