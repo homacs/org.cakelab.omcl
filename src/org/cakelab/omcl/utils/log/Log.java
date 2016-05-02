@@ -18,7 +18,7 @@ public class Log {
 	public static void fatal(String msg, Throwable e) {
 		for (LogListener listener : listeners) {
 			try {
-				listener.error(msg, e);
+				listener.fatal(msg, e);
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
@@ -28,7 +28,7 @@ public class Log {
 	public static void fatal(String msg) {
 		for (LogListener listener : listeners) {
 			try {
-				listener.error(msg);
+				listener.fatal(msg);
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
