@@ -5,12 +5,15 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import org.cakelab.json.codec.JSONCodec;
+import org.cakelab.json.codec.JSONCodecConfiguration;
 import org.cakelab.json.codec.JSONCodecException;
 import org.cakelab.omcl.utils.json.JsonSaveable;
 
 public class PackageDescriptor implements JsonSaveable {
+	private static JSONCodecConfiguration jsonConfig = new JSONCodecConfiguration(Charset.defaultCharset(), true, true);
 
 	public static final String FILENAME = "package.json";
 	
@@ -48,14 +51,14 @@ public class PackageDescriptor implements JsonSaveable {
 	}
 
 	public static PackageDescriptor load(InputStream in) throws JSONCodecException, IOException {
-		JSONCodec codec = new JSONCodec(true, true);
+		JSONCodec codec = new JSONCodec(jsonConfig);
 		PackageDescriptor descriptor = (PackageDescriptor) codec.decodeObject(in, PackageDescriptor.class);
 		return descriptor;
 	}
 
 	public void save(File target) throws IOException, JSONCodecException {
 		FileOutputStream out = new FileOutputStream(target);
-		JSONCodec codec = new JSONCodec(true, true);
+		JSONCodec codec = new JSONCodec(jsonConfig);
 		codec.encodeObject(this,  out);
 		
 		out.close();

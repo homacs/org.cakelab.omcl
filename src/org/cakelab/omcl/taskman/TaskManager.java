@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 
@@ -15,10 +16,12 @@ import org.cakelab.json.JSONException;
 import org.cakelab.json.JSONObject;
 import org.cakelab.json.Parser;
 import org.cakelab.json.codec.JSONCodec;
+import org.cakelab.json.codec.JSONCodecConfiguration;
 import org.cakelab.json.codec.JSONCodecException;
 
 
 public class TaskManager {
+	private static JSONCodecConfiguration jsonConfig = new JSONCodecConfiguration(Charset.defaultCharset(), true, true);
 
 	/* TODO: turn this into a generic persistent task manager 
 	 * - guarantee atomicity of scheduling and finishing of tasks
@@ -57,7 +60,7 @@ public class TaskManager {
 	
 			JSONArray entries = (JSONArray) logdb.get("log");
 	
-			JSONCodec codec = new JSONCodec(true, true);
+			JSONCodec codec = new JSONCodec(jsonConfig);
 	
 			
 			ClassLoader cl = TaskManager.class.getClassLoader();
@@ -80,7 +83,7 @@ public class TaskManager {
 	}
 
 	public void updateDB() throws JSONCodecException, IOException {
-		JSONCodec codec = new JSONCodec(true, true);
+		JSONCodec codec = new JSONCodec(jsonConfig);
 
 		FileOutputStream out = new FileOutputStream(dbfile);
 		

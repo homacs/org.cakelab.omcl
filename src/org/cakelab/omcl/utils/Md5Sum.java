@@ -34,9 +34,9 @@ public class Md5Sum {
 			String hex = toHex(digest);
 			return hex;
 		} catch (IOException e) {
-			Log.warn("the file we should check just disappeared.");
+			Log.warn("the file we should check just disappeared.", e);
 		} catch (NoSuchAlgorithmException e1) {
-			Log.warn("MD5 algorithm not available.");
+			Log.warn("MD5 algorithm not available.", e1);
 			
 		}
 		return null;

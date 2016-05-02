@@ -5,15 +5,17 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.cakelab.json.codec.JSONCodec;
+import org.cakelab.json.codec.JSONCodecConfiguration;
 import org.cakelab.json.codec.JSONCodecException;
 import org.cakelab.omcl.utils.json.JsonSaveable;
 
 public class Versions implements JsonSaveable {
 	public static String FILENAME = "versions.json";
-	
+	private static JSONCodecConfiguration jsonConfig = new JSONCodecConfiguration(Charset.defaultCharset(), true, true);
 	
 	int latest;
 	String[] available;
@@ -28,14 +30,14 @@ public class Versions implements JsonSaveable {
 	}
 
 	public static Versions load(InputStream in) throws JSONCodecException, IOException {
-		JSONCodec codec = new JSONCodec(true, true);
+		JSONCodec codec = new JSONCodec(jsonConfig);
 		Versions versions = (Versions) codec.decodeObject(in, Versions.class);
 		return versions;
 	}
 
 	public void save(File target) throws IOException, JSONCodecException {
 		FileOutputStream out = new FileOutputStream(target);
-		JSONCodec codec = new JSONCodec(true, true);
+		JSONCodec codec = new JSONCodec(jsonConfig);
 		codec.encodeObject(this,  out);
 		
 		out.close();
