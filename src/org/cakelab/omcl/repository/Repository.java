@@ -264,7 +264,7 @@ public class Repository {
 	 */
 	public boolean isLocalPackageHealthy(PackageDescriptor pd) {
 		File packageFile = new File(getLocalLocation(pd), pd.filename);
-		if (packageFile.exists()) {
+		if (packageFile.exists() && packageFile.isFile()) {
 			return pd.checksum == null || Md5Sum.check(packageFile, pd.checksum);
 		} else {
 			return false;
