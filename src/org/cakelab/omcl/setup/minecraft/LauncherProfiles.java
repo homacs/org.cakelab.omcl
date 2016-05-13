@@ -25,6 +25,7 @@ public class LauncherProfiles {
 
 
 	public static final String ATTR_LAST_VERSION_ID = "lastVersionId";
+	private static final String ATTR_AUTHENTICATION_DATABASE = "authenticationDatabase";
 
 	public static final String ATTR_LAUNCHER_VISIBILITY_ON_GAME_CLOSE = "launcherVisibilityOnGameClose";
 	public static final String ATTR_LAUNCHER_VISIBILITY_RULE_CLOSE_ON_START = "close launcher when game starts";
@@ -33,6 +34,11 @@ public class LauncherProfiles {
 
 
 	public static final Charset PROFILE_CHARSET = Charset.defaultCharset();
+
+
+	private static final String ATTR_SELECTED_USER = "selectedUser";
+
+
 
 	private JSONObject content;
 	private transient File profilesFile;
@@ -227,6 +233,35 @@ public class LauncherProfiles {
 
 	public void clearProfiles() {
 		content.put("profiles", new JSONObject());
+		modified = true;
+	}
+
+
+
+
+	public AuthDB getAuthenticationDatabase() {
+		return new AuthDB((JSONObject)content.get(ATTR_AUTHENTICATION_DATABASE));
+	}
+
+
+
+
+	public String getSelectedUser() {
+		return content.getString(ATTR_SELECTED_USER);
+	}
+
+
+
+
+	public void setSelectedUser(String id) {
+		String currentId = getSelectedUser();
+		if (currentId == id || (currentId != null && currentId.equals(id))) return;
+		
+		if (id == null) {
+			content.remove(ATTR_SELECTED_USER);
+		} else {
+			content.put(ATTR_SELECTED_USER, id);
+		}
 		modified = true;
 	}
 
