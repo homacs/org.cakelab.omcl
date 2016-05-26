@@ -19,6 +19,7 @@ public class Versions implements JsonSaveable {
 	
 	int latest;
 	String[] available;
+	private transient String[] versionStringsCache;
 	
 	
 	
@@ -48,10 +49,28 @@ public class Versions implements JsonSaveable {
 	}
 
 	public String getLatestVersionString() {
-		return new File(available[latest]).getName();
+		return getAvailableVersionStrings()[latest];
 	}
 
+	
+	private String getVersionString(String location) {
+		return new File(location).getName();
+	}
+	
+	public String[] getAvailableVersionStrings() {
+		if (versionStringsCache == null) {
+			versionStringsCache = new String[available.length];
+			for (int i = 0; i < available.length; i++) {
+				versionStringsCache[i] = getVersionString(available[i]);
+			}
+		}
+		return versionStringsCache;
+	}
+
+	
 	public int addAvailable(String location) {
+		versionStringsCache = null;
+		
 		if (available == null) {
 			available = new String[]{location};
 			return 0;
