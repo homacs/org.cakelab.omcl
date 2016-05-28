@@ -14,16 +14,18 @@ public class SetupParameters {
 	public File gamedir;
 	public GameTypes type;
 	public String version;
+	public boolean keepVersion;
 	public String javaArgs;
 	public String shader;
 
 	public SetupParameters(GameConfig gameConfig, File workdir, File gamedir,
-			String version, GameTypes type, String javaArgs, String shader) {
+			String version, boolean keepVersion, GameTypes type, String javaArgs, String shader) {
 		super();
 		this.gameConfig = gameConfig;
 		this.workdir = workdir;
 		this.gamedir = gamedir;
 		this.version = version;
+		this.keepVersion = keepVersion;
 		this.type = type;
 		this.javaArgs = javaArgs;
 		this.shader = shader;
