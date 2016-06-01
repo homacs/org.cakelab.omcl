@@ -26,13 +26,17 @@ public abstract class SetupService {
 
 	public abstract boolean isDownloaded();
 	
-	public abstract boolean isInstalled();
+	public abstract boolean isBaseInstalled();
 	
 	public abstract boolean hasUpgrade();
 
+	public abstract boolean hasModifications();
+	
 	public abstract void scheduleDownloads(TaskManager taskman, boolean force) throws Throwable;
 
 	public abstract void scheduleInstalls(TaskManager taskman, boolean force) throws Throwable;
+
+	public abstract void scheduleModifications(TaskManager taskman, boolean force) throws Throwable;
 
 	public abstract void scheduleUpgrades(TaskManager taskman, SetupService formerVersionSetupService) throws Throwable;
 
@@ -65,11 +69,6 @@ public abstract class SetupService {
 			}
 		}
 	}
-
-
-
-
-
 
 
 

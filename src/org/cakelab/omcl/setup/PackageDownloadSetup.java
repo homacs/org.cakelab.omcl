@@ -30,7 +30,7 @@ public class PackageDownloadSetup  extends SetupService {
 	}
 
 	@Override
-	public boolean isInstalled() {
+	public boolean isBaseInstalled() {
 		return super.isLocalPackageAvailable();
 	}
 
@@ -64,6 +64,17 @@ public class PackageDownloadSetup  extends SetupService {
 	public static SetupService getSetupService(SetupParameters setupParams,
 			PackageDescriptor pd, Repository repository) {
 		return new PackageDownloadSetup(setupParams, pd, repository);
+	}
+
+	@Override
+	public boolean hasModifications() {
+		// override this method if you need it
+		return false;
+	}
+
+	@Override
+	public void scheduleModifications(TaskManager taskman, boolean force) {
+		// override this method if you need it
 	}
 
 

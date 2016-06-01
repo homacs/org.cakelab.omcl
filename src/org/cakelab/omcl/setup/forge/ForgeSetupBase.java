@@ -33,7 +33,7 @@ public abstract class ForgeSetupBase extends SetupService {
 	
 
 	@Override
-	public boolean isInstalled() {
+	public boolean isBaseInstalled() {
 		return successIndicator.exists() && forgedJar.exists() && profileIsForged(setupParams.gameConfig.getProfileName());
 	}
 
@@ -51,6 +51,16 @@ public abstract class ForgeSetupBase extends SetupService {
 		return false;
 	}
 
+	@Override
+	public boolean hasModifications() {
+		// TODO not defined for forge packages
+		return false;
+	}
+
+	@Override
+	public void scheduleModifications(TaskManager taskman, boolean force) {
+		// TODO not defined for forge packages
+	}
 
 	
 	protected boolean profileIsForged(String profileName) {
@@ -64,7 +74,7 @@ public abstract class ForgeSetupBase extends SetupService {
 
 	@Override
 	public void scheduleDownloads(TaskManager taskman, boolean forced) throws Throwable {
-		if (!isInstalled() || forced) super.schedulePackageDownload(taskman);
+		if (!isBaseInstalled() || forced) super.schedulePackageDownload(taskman);
 	}
 
 	@Override

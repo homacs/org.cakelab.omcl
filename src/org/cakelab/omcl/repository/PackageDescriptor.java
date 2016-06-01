@@ -10,6 +10,7 @@ import java.nio.charset.Charset;
 import org.cakelab.json.codec.JSONCodec;
 import org.cakelab.json.codec.JSONCodecConfiguration;
 import org.cakelab.json.codec.JSONCodecException;
+import org.cakelab.omcl.update.URLPath;
 import org.cakelab.omcl.utils.json.JsonSaveable;
 
 public class PackageDescriptor implements JsonSaveable {
@@ -95,6 +96,10 @@ public class PackageDescriptor implements JsonSaveable {
 
 	public String getDownloadUrl() {
 		return downloadUrl;
+	}
+
+	public String getID() {
+		return new URLPath(location).getParent().toString();
 	}
 
 }

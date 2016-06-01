@@ -18,8 +18,10 @@ public class SetupParameters {
 	public String javaArgs;
 	public String shader;
 
+	public String[] optionals;
+
 	public SetupParameters(GameConfig gameConfig, File workdir, File gamedir,
-			String version, boolean keepVersion, GameTypes type, String javaArgs, String shader) {
+			String version, boolean keepVersion, GameTypes type, String javaArgs, String shader, String[] optionals) {
 		super();
 		this.gameConfig = gameConfig;
 		this.workdir = workdir;
@@ -29,6 +31,7 @@ public class SetupParameters {
 		this.type = type;
 		this.javaArgs = javaArgs;
 		this.shader = shader;
+		this.optionals = optionals;
 	}
 
 	

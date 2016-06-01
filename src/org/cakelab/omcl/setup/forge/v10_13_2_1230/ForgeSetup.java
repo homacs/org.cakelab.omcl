@@ -40,7 +40,5 @@ public class ForgeSetup extends ForgeSetupBase {
 		String mcVer = minecraftClient.getVersion();
 		return mcVer + "-Forge" + getForgeInternalVersion();
 	}
-	
-	
 
 }

@@ -66,7 +66,7 @@ public class MinecraftClient extends SetupService {
 	}
 
 	@Override
-	public boolean isInstalled() {
+	public boolean isBaseInstalled() {
 		return profileExists(setupParams.gameConfig.getProfileName()) 
 				&& launcher.exists() && jar.exists();
 	}
@@ -92,7 +92,7 @@ public class MinecraftClient extends SetupService {
 
 	@Override
 	public void scheduleInstalls(TaskManager taskman, boolean force) throws Throwable {
-		if (!isInstalled()) {
+		if (!isBaseInstalled()) {
 			String minecraftWorkingDir = minecraftWorkdir.getAbsolutePath();
 			if (!launcher.exists() || !launcherProfilesFile.exists()) {
 				taskman.addSingleTask(new InitMinecraftWorkDir(bootstrap.getJar(), setupParams.workdir.getAbsolutePath(), descriptor.version, true));
@@ -163,6 +163,17 @@ public class MinecraftClient extends SetupService {
 
 	public File getLibrariesDirectory() {
 		return librariesDir;
+	}
+
+	@Override
+	public boolean hasModifications() {
+		// not defined for minecraft vanilla client packages
+		return false;
+	}
+
+	@Override
+	public void scheduleModifications(TaskManager taskman, boolean force) {
+		// not defined for minecraft vanilla client packages
 	}
 
 }

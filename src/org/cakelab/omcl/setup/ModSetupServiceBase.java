@@ -10,10 +10,10 @@ import org.cakelab.omcl.setup.tasks.Delete;
 import org.cakelab.omcl.taskman.TaskManager;
 
 
-public class ModSetupServiceBase extends SetupService {
+public abstract class ModSetupServiceBase extends SetupService {
 
 	protected File modfile;
-
+	
 	protected ModSetupServiceBase(SetupParameters setupParams, PackageDescriptor pd,
 			Repository repository) {
 		super(setupParams, pd, repository);
@@ -30,7 +30,7 @@ public class ModSetupServiceBase extends SetupService {
 	}
 
 	@Override
-	public boolean isInstalled() {
+	public boolean isBaseInstalled() {
 		return modfile.exists();
 	}
 
@@ -48,7 +48,7 @@ public class ModSetupServiceBase extends SetupService {
 
 	@Override
 	public void scheduleInstalls(TaskManager taskman, boolean force) throws Throwable {
-		if (!isInstalled() || force) {
+		if (!isBaseInstalled() || force) {
 			taskman.addSingleTask(new Copy("installing mod", getPackageRepositoryFile().getPath(), modfile.getPath()));
 		}
 	}
@@ -61,7 +61,7 @@ public class ModSetupServiceBase extends SetupService {
 
 	@Override
 	public void scheduleRemove(TaskManager taskman) throws Throwable {
-		if (isInstalled()) {
+		if (isBaseInstalled()) {
 			taskman.addSingleTask(new Delete("upgrading mod-pack", modfile.getAbsolutePath()));
 		}
 	}

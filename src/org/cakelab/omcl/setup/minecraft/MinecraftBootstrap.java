@@ -26,7 +26,7 @@ public class MinecraftBootstrap extends SetupService {
 
 
 	@Override
-	public boolean isInstalled() {
+	public boolean isBaseInstalled() {
 		// This is installed if its downloaded
 		return isDownloaded();
 	}
@@ -44,6 +44,16 @@ public class MinecraftBootstrap extends SetupService {
 		return true;
 	}
 
+	@Override
+	public boolean hasModifications() {
+		// not defined for minecraft bootstrap packages
+		return false;
+	}
+
+	@Override
+	public void scheduleModifications(TaskManager taskman, boolean force) {
+		// not defined for minecraft bootstrap packages
+	}
 	
 	public static MinecraftBootstrap getSetupService(
 			SetupParameters setupParams,
