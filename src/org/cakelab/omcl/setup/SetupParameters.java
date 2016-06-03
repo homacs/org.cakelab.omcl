@@ -7,7 +7,7 @@ import org.cakelab.omcl.config.GameTypes;
 
 
 public class SetupParameters {
-
+	// TODO: make everything private
 	public GameConfig gameConfig;
 	
 	public File workdir;
@@ -17,7 +17,6 @@ public class SetupParameters {
 	public boolean keepVersion;
 	public String javaArgs;
 	public String shader;
-
 	public String[] optionals;
 
 	public SetupParameters(GameConfig gameConfig, File workdir, File gamedir,
@@ -34,5 +33,15 @@ public class SetupParameters {
 		this.optionals = optionals;
 	}
 
+	public boolean containsOptionalAddon(String location) {
+		if (optionals != null) {
+			for (String l : optionals) {
+				if (l.equals(location)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 	
 }
