@@ -127,6 +127,10 @@ public class URLPath {
 		tmp[newLength-1] = component;
 		return new URLPath(protocol, tmp, newLength);
 	}
+
+	public String getLast() {
+		return components[components.length-1];
+	}
 	
 	
 }

@@ -44,6 +44,7 @@ public class Repository {
 
 	protected int revision;
 	protected TransactionContext tx;
+	private boolean treatCorruptedFilesAsNoLongerExisting;
 	
 	
 	public Repository(UpdateServer updateServer, File root) {
@@ -53,12 +54,20 @@ public class Repository {
 		tx = updateServer.getTransactionContext();
 	}
 
-	
-	public void init() throws IOException, JSONCodecException, ServerLockedException, TransportException {
+	/**
+	 * 
+	 * @param treatCorruptedFilesAsNoLongerExisting This parameter has been introduced to support web servers which send a valid response on non existing document paths. If your web server does this, than use true.
+	 * @throws IOException
+	 * @throws JSONCodecException
+	 * @throws ServerLockedException
+	 * @throws TransportException
+	 */
+	public void init(boolean treatCorruptedFilesAsNoLongerExisting) throws IOException, JSONCodecException, ServerLockedException, TransportException {
 		//
 		// Read local repository revision
 		//
 		
+		this.treatCorruptedFilesAsNoLongerExisting = treatCorruptedFilesAsNoLongerExisting;
 		readLocalRevision();
 
 		//
@@ -110,19 +119,36 @@ public class Repository {
 				for (File file : FileSystem.listRecursive(root)) {
 					if (file.getName().equals(Versions.FILENAME)) {
 						String baseLocation = new File(file.getPath().replace(root.getPath(), "")).getParent();
-						Versions versions = updateServer.getVersions(new URLPath(baseLocation));
-						saveables.add(new JsonSaveTask(versions, file));
+						try {
+							Versions versions = updateServer.getVersions(new URLPath(baseLocation));
+							saveables.add(new JsonSaveTask(versions, file));
+						} catch (TransportException e) {
+							if (e.getCause() != null && e.getCause() instanceof FileNotFoundException) {
+								Log.warn("versions file at " + baseLocation + " does no longer exist on server side - ignored");
+								// TODO: determine whether this package is still in use (dependencies)
+							} else if (treatCorruptedFilesAsNoLongerExisting && e.getCause() != null && e.getCause() instanceof JSONCodecException) {
+								Log.warn("received corrupted versions file at " + baseLocation + " from server side - ignored");
+								// TODO: kick Tim in his butt to fix the web server!
+							} else {
+								throw e;
+							}
+						}
 					}
 					else if (file.getName().equals(PackageDescriptor.FILENAME)) 
 					{
-						String location = new File(file.getPath().replace(root.getPath(), "")).getParent();
+						String location = new File(file.getPath().replace(root.getPath() + "/", "")).getParent();
 						try {
 							PackageDescriptor newDescriptor = updateServer.getPackageDescriptorForLocation(location);
-							saveables.add(new JsonSaveTask(newDescriptor, file));
+							if (checkDescriptorIntegrity(location, newDescriptor)) {
+								saveables.add(new JsonSaveTask(newDescriptor, file));
+							}
 						} catch (TransportException e) {
 							if (e.getCause() != null && e.getCause() instanceof FileNotFoundException) {
 								Log.warn("package " + location + " does no longer exist on server side - ignored");
 								// TODO: determine whether this package is still in use (dependencies)
+							} else if (treatCorruptedFilesAsNoLongerExisting && e.getCause() != null && e.getCause() instanceof JSONCodecException) {
+								Log.warn("received corrupted package " + location + " from server side - ignored");
+								// TODO: kick Tim in his butt to fix the web server!
 							} else {
 								throw e;
 							}
@@ -145,6 +171,38 @@ public class Repository {
 		}
 		
 	}
+
+	private boolean checkDescriptorIntegrity(String location,
+			PackageDescriptor descriptor) throws TransportException {
+		// We need this method to verify data received from a web server which sends
+		// valid HTTP replies even if the requested document does not exist!
+		// TODO: kick Tim in his butt to fix his web server!
+		
+		if (descriptor.location != null && !descriptor.location.equals(location)) {
+			String message = "received invalid descriptor:"
+					+ "\n\trequested: " + location
+					+ "\n\treceived:  " + descriptor.location;
+			if (treatCorruptedFilesAsNoLongerExisting) {
+				Log.warn(message);
+				return false;
+			}
+			else throw new TransportException(message);
+		} else {
+			String version = new URLPath(location).getLast();
+			if (version == null || !version.equals(descriptor.version)) {
+				String message = "received descriptor with invalid version field"
+						+ "\n\trequested: " + version
+						+ "\n\treceived:  " + descriptor.version;
+				if (treatCorruptedFilesAsNoLongerExisting) {
+					Log.warn(message);
+					return false;
+				}
+				else throw new TransportException(message);
+			}
+		}
+		return true;
+	}
+
 
 	protected void prepareUpdate(ArrayList<JsonSaveTask> saveables) throws TransportException, ServerLockedException {}
 	protected void finishUpdate(ArrayList<JsonSaveTask> saveables) throws TransportException, ServerLockedException {}
@@ -270,9 +328,6 @@ public class Repository {
 			return false;
 		}
 	}
-
-
-	
 	
 	public PackageDescriptor getLocalPackageDescriptorFromLocation(String packageLocation) throws IOException, JSONCodecException {
 		File file = getLocalPackageDescriptorFileFromLocation(packageLocation);
