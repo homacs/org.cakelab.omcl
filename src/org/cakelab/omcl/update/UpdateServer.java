@@ -96,10 +96,10 @@ public class UpdateServer {
 						txadvisor.validate(baseLocation,  versions);
 						break; // success -> exit inner loop
 					} catch (SocketTimeoutException e) {
-						txadvisor.checkRetry(baseLocation, attempt+=CONNECT_TIMEOUT_MULTIPLIER, e);
+						txadvisor.checkRetry(versionsPath, attempt+=CONNECT_TIMEOUT_MULTIPLIER, e);
 						UrlConnectionUtils.close(in);
 					} catch (Throwable e) {
-						txadvisor.checkRetry(baseLocation, ++attempt, e);
+						txadvisor.checkRetry(versionsPath, ++attempt, e);
 						UrlConnectionUtils.close(in);
 					}
 				}
@@ -154,10 +154,10 @@ public class UpdateServer {
 						txadvisor.validate(locationPath, descriptor);
 						break; // success -> exit inner loop
 					} catch (SocketTimeoutException e) {
-						txadvisor.checkRetry(locationPath, attempt+=CONNECT_TIMEOUT_MULTIPLIER, e);
+						txadvisor.checkRetry(path, attempt+=CONNECT_TIMEOUT_MULTIPLIER, e);
 						UrlConnectionUtils.close(in);
 					} catch (Throwable e) {
-						txadvisor.checkRetry(locationPath, ++attempt, e);
+						txadvisor.checkRetry(path, ++attempt, e);
 						UrlConnectionUtils.close(in);
 					}
 				}
