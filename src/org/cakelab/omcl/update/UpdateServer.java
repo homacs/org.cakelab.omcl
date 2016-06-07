@@ -17,6 +17,33 @@ import org.cakelab.omcl.utils.log.Log;
 
 public class UpdateServer {
 
+	public static class DefaultTransactionAdvisor implements TransactionAdvisor {
+
+		public void checkRetry(URLPath path, int i, Throwable e) throws Throwable {
+			if (i < MAX_DOWNLOAD_ATTEMPTS) {
+				if (e instanceof IOException || e instanceof JSONCodecException || e instanceof NumberFormatException) {
+					Log.info("received '" + e.toString() + "' (" + i + "/" + MAX_DOWNLOAD_ATTEMPTS + ")");
+					return;
+				} else {
+					throw e;
+				}
+			} else {
+				throw e;
+			}
+		}
+
+		@Override
+		public void validate(URLPath path, PackageDescriptor descriptor) throws Throwable {
+			return;
+		}
+
+		@Override
+		public void validate(URLPath path, Versions versions) throws Throwable {
+			return;
+		}
+
+	}
+
 	public static final String PRIMARY_UPDATE_URL   = "http://lifeinthewoods.ca/litwr/repository";
 	public static final String SECONDARY_UPDATE_URL = "http://homac.cakelab.org/projects/litwrl/repository";
 	
@@ -28,8 +55,10 @@ public class UpdateServer {
 	private volatile boolean offline;
 	private TransactionContext tx;
 	private int firstRevision;
+	private TransactionAdvisor txadvisor;
 
-	public UpdateServer(URL root) throws ServerLockedException, TransportException {
+	public UpdateServer(URL root, TransactionAdvisor txadvisor) throws ServerLockedException, TransportException {
+		this.txadvisor = txadvisor == null ? new DefaultTransactionAdvisor() : txadvisor;
 		this.root = new URLPath(root);
 		offline = false;
 		tx = new TransactionContext(this);
@@ -64,18 +93,22 @@ public class UpdateServer {
 					try {
 						in = UrlConnectionUtils.getInputStream(versionsPath.toURL(), CONNECT_TIMEOUT, READ_TIMEOUT);
 						versions = Versions.load(in);
+						txadvisor.validate(baseLocation,  versions);
 						break; // success -> exit inner loop
 					} catch (SocketTimeoutException e) {
-						checkRetry(attempt+=CONNECT_TIMEOUT_MULTIPLIER, e);
+						txadvisor.checkRetry(baseLocation, attempt+=CONNECT_TIMEOUT_MULTIPLIER, e);
 						UrlConnectionUtils.close(in);
 					} catch (Throwable e) {
-						checkRetry(++attempt, e);
+						txadvisor.checkRetry(baseLocation, ++attempt, e);
 						UrlConnectionUtils.close(in);
 					}
 				}
 			} while (!tx.commit());
 			UrlConnectionUtils.close(in);
 			return versions;
+		} catch (TransactionFallThrough e) {
+			tx.commit();
+			throw new TransportException(e.getCause());
 		} catch (Throwable e) {
 			tx.abortAndThrow(e);
 		} finally {
@@ -85,20 +118,6 @@ public class UpdateServer {
 		return null;
 	}
 	
-
-	private void checkRetry(int i, Throwable e) throws Throwable {
-		if (i < MAX_DOWNLOAD_ATTEMPTS) {
-			if (e instanceof IOException || e instanceof JSONCodecException || e instanceof NumberFormatException) {
-				Log.info("received '" + e.toString() + "' (" + i + "/" + MAX_DOWNLOAD_ATTEMPTS + ")");
-				return;
-			} else {
-				throw e;
-			}
-		} else {
-			throw e;
-		}
-	}
-
 
 	public boolean exists(URLPath documentLocation) throws TransportException, ServerLockedException {
 		try {
@@ -119,8 +138,9 @@ public class UpdateServer {
 		return root.append(baseLocation).append(Versions.FILENAME);
 	}
 
-	public PackageDescriptor getPackageDescriptorForLocation(String newLocation) throws TransportException, ServerLockedException {
-		URLPath path = root.append(new URLPath(newLocation)).append(PackageDescriptor.FILENAME);
+	public PackageDescriptor getPackageDescriptorForLocation(String location) throws TransportException, ServerLockedException {
+		URLPath locationPath = new URLPath(location);
+		URLPath path = root.append(locationPath).append(PackageDescriptor.FILENAME);
 		InputStream in = null;
 		try {
 			PackageDescriptor descriptor;
@@ -131,12 +151,13 @@ public class UpdateServer {
 					try {
 						in = UrlConnectionUtils.getInputStream(path.toURL(), CONNECT_TIMEOUT, READ_TIMEOUT);
 						descriptor = PackageDescriptor.load(in);
+						txadvisor.validate(locationPath, descriptor);
 						break; // success -> exit inner loop
 					} catch (SocketTimeoutException e) {
-						checkRetry(attempt+=CONNECT_TIMEOUT_MULTIPLIER, e);
+						txadvisor.checkRetry(locationPath, attempt+=CONNECT_TIMEOUT_MULTIPLIER, e);
 						UrlConnectionUtils.close(in);
 					} catch (Throwable e) {
-						checkRetry(++attempt, e);
+						txadvisor.checkRetry(locationPath, ++attempt, e);
 						UrlConnectionUtils.close(in);
 					}
 				}
@@ -144,6 +165,9 @@ public class UpdateServer {
 			} while (!tx.commit());
 			UrlConnectionUtils.close(in);
 			return descriptor;
+		} catch (TransactionFallThrough e) {
+			tx.commit();
+			throw new TransportException(e.getCause());
 		} catch (Throwable e) {
 			tx.abortAndThrow(e);
 		} finally {
@@ -167,13 +191,16 @@ public class UpdateServer {
 					revision = Integer.parseInt(s.trim());
 					break; // success -> exit inner loop
 				} catch (SocketTimeoutException e) {
-					checkRetry(attempt+=CONNECT_TIMEOUT_MULTIPLIER, e);
+					txadvisor.checkRetry(path, attempt+=CONNECT_TIMEOUT_MULTIPLIER, e);
 					UrlConnectionUtils.close(in);
 				} catch (Throwable e) {
-					checkRetry(++attempt, e);
+					txadvisor.checkRetry(path, ++attempt, e);
 					UrlConnectionUtils.close(in);
 				}
 			}
+		} catch (TransactionFallThrough e) {
+			tx.commit();
+			throw new TransportException(e.getCause());
 		} catch (Throwable e) {
 			this.offline = true;
 			throw new TransportException(e);

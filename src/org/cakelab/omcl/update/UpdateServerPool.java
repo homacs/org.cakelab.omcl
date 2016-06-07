@@ -15,13 +15,15 @@ public class UpdateServerPool extends ArrayList<UpdateServer>{
 
 		private UpdateServer updateServer;
 		private int i;
-		public ConnectThread(int i) {
+		private TransactionAdvisor txadvisor;
+		public ConnectThread(int i, TransactionAdvisor txadvisor) {
 			super("connect (" + i + ")");
 			this.i = i;
+			this.txadvisor = txadvisor;
 		}
 		public void run() {
 			try {
-				updateServer = new UpdateServer(new URL(UpdateServerPool.this.pool[i]));
+				updateServer = new UpdateServer(new URL(UpdateServerPool.this.pool[i]), txadvisor);
 			} catch (Throwable t) {
 				Log.warn("can't connect to update server.", t);
 				updateServer = OFFLINE;
@@ -62,12 +64,12 @@ public class UpdateServerPool extends ArrayList<UpdateServer>{
 	}
 
 
-	public UpdateServer connect(int minRevision) {
+	public UpdateServer connect(int minRevision, TransactionAdvisor txadvisor) {
 		
 		ConnectThread[] connectThreads = new ConnectThread[pool.length];
 		
 		for (int i = 0; i < pool.length; i++) {
-			connectThreads[i] = new ConnectThread(i);
+			connectThreads[i] = new ConnectThread(i, txadvisor);
 			connectThreads[i].start();
 		}
 		

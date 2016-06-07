@@ -118,7 +118,7 @@ public class Repository {
 				
 				for (File file : FileSystem.listRecursive(root)) {
 					if (file.getName().equals(Versions.FILENAME)) {
-						String baseLocation = new File(file.getPath().replace(root.getPath(), "")).getParent();
+						String baseLocation = getRepositoryPath(file);
 						try {
 							Versions versions = updateServer.getVersions(new URLPath(baseLocation));
 							saveables.add(new JsonSaveTask(versions, file));
@@ -136,7 +136,7 @@ public class Repository {
 					}
 					else if (file.getName().equals(PackageDescriptor.FILENAME)) 
 					{
-						String location = new File(file.getPath().replace(root.getPath() + "/", "")).getParent();
+						String location = getRepositoryPath(file);
 						try {
 							PackageDescriptor newDescriptor = updateServer.getPackageDescriptorForLocation(location);
 							if (checkDescriptorIntegrity(location, newDescriptor)) {
@@ -170,6 +170,10 @@ public class Repository {
 			tx.abortAndThrow(e);
 		}
 		
+	}
+
+	private String getRepositoryPath(File file) {
+		return FileSystem.removeParentPath(root, file).getParent().replace("\\", "/");
 	}
 
 	private boolean checkDescriptorIntegrity(String location,
