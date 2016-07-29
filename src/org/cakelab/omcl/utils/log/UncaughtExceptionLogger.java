@@ -12,6 +12,8 @@ class UncaughtExceptionLogger implements Thread.UncaughtExceptionHandler {
 			Log.error("uncaught exception: ", throwable);
 		} catch (Throwable t) {
 			// can't do anything
+			System.err.println("uncaught exception:");
+			throwable.printStackTrace(System.err);
 		}
 	}
 
