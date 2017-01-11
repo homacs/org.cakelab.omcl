@@ -10,8 +10,8 @@ import java.nio.charset.Charset;
 import org.cakelab.json.JSONException;
 import org.cakelab.json.JSONObject;
 import org.cakelab.json.JSONPrettyprint;
-import org.cakelab.json.Parser;
 import org.cakelab.json.codec.JSONCodecException;
+import org.cakelab.json.codec.Parser;
 import org.cakelab.omcl.utils.OS;
 
 public class LauncherProfiles {

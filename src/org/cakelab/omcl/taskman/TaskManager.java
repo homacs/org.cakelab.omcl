@@ -14,10 +14,10 @@ import org.cakelab.omcl.utils.log.Log;
 import org.cakelab.json.JSONArray;
 import org.cakelab.json.JSONException;
 import org.cakelab.json.JSONObject;
-import org.cakelab.json.Parser;
 import org.cakelab.json.codec.JSONCodec;
 import org.cakelab.json.codec.JSONCodecConfiguration;
 import org.cakelab.json.codec.JSONCodecException;
+import org.cakelab.json.codec.Parser;
 
 
 public class TaskManager {
