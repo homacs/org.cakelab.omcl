@@ -19,6 +19,8 @@ public abstract class ForgeServicesStub extends ServicesStubBase {
 			return org.cakelab.omcl.plugins.forge.v10_13_2_1230.ForgeServicesStub.create(jar, listener);
 		} else if (forgeVersion.equals("10.13.4.1614")) {
 			return org.cakelab.omcl.plugins.forge.v10_13_4_1614.ForgeServicesStub.create(jar, listener);
+		} else if (forgeVersion.equals("12.18.3.2185")) {
+			return org.cakelab.omcl.plugins.forge.v12_18_3_2185.ForgeServicesStub.create(jar, listener);
 		} else {
 			throw new StubException("No forge services plugin available for version " + forgeVersion);
 		}

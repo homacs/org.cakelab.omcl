@@ -14,16 +14,16 @@ public class UpdateServerPool extends ArrayList<UpdateServer>{
 	public class ConnectThread extends Thread {
 
 		private UpdateServer updateServer;
-		private int i;
+		private int serverId;
 		private TransactionAdvisor txadvisor;
-		public ConnectThread(int i, TransactionAdvisor txadvisor) {
-			super("connect (" + i + ")");
-			this.i = i;
+		public ConnectThread(int serverId, TransactionAdvisor txadvisor) {
+			super("connect (" + serverId + ")");
+			this.serverId = serverId;
 			this.txadvisor = txadvisor;
 		}
 		public void run() {
 			try {
-				updateServer = new UpdateServer(new URL(UpdateServerPool.this.pool[i]), txadvisor);
+				updateServer = new UpdateServer(new URL(UpdateServerPool.this.pool[serverId]), txadvisor);
 			} catch (Throwable t) {
 				Log.warn("can't connect to update server.", t);
 				updateServer = OFFLINE;
@@ -39,13 +39,6 @@ public class UpdateServerPool extends ArrayList<UpdateServer>{
 
 
 	private String[] pool;
-	
-	public static final String[] UPDATE_URLS = new String[] {
-		"http://www.lifeinthewoods.eu/litwr/repository",
-		"http://lifeinthewoods.phedran.com/litwr/repository",
-		"http://lifeinthewoods.getitfromhere.co.uk/litwr/repository"
-	};
-
 	
 	public UpdateServerPool(String primary, String[] serverPool) {
 		super(serverPool != null ? serverPool.length+1 : 1);

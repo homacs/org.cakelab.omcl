@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="org/cakelab/omcl/plugins/forge/v10_13_2_1230/migrates/|org/cakelab/omcl/plugins/forge/v10_13_4_1614/migrates/" kind="src" path="src"/>
 	<classpathentry kind="src" path="src-jnbt"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.cakelab.json"/>
 	<classpathentry kind="lib" path="libs/launcher.jar"/>
 	<classpathentry kind="lib" path="libs/Minecraft.jar"/>
-	<classpathentry kind="lib" path="libs/forge-1.7.10-10.13.2.1230-installer.jar"/>
-	<classpathentry kind="lib" path="libs/forge-1.7.10-10.13.4.1614-1.7.10-installer.jar"/>
+	<classpathentry kind="lib" path="libs/forge-1.10.2-12.18.3.2185-installer.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/java-7-oracle"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

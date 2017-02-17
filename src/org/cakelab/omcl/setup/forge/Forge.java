@@ -16,6 +16,8 @@ public class Forge {
 			return new org.cakelab.omcl.setup.forge.v10_13_2_1230.ForgeSetup(setupParams, forgeDescriptor, repository, minecraftClient);
 		} else if (version.equals("1.7.10-10.13.4.1614")) {
 			return new org.cakelab.omcl.setup.forge.v10_13_4_1614.ForgeSetup(setupParams, forgeDescriptor, repository, minecraftClient);
+		} else if (version.equals("1.10.2-12.18.3.2185")) {
+			return new org.cakelab.omcl.setup.forge.v12_18_3_2185.ForgeSetup(setupParams, forgeDescriptor, repository, minecraftClient);
 		} else {
 			throw new RuntimeException("no setup service for forge version " + version + " found");
 		}

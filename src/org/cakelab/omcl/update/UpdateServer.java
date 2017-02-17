@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 
 import org.cakelab.json.codec.JSONCodecException;
@@ -21,7 +22,13 @@ public class UpdateServer {
 
 		public void checkRetry(URLPath path, int i, Throwable e) throws Throwable {
 			if (i < MAX_DOWNLOAD_ATTEMPTS) {
-				if (e instanceof IOException || e instanceof JSONCodecException || e instanceof NumberFormatException) {
+				if (e instanceof UnknownHostException) {
+					// no need to retry
+					throw e;
+				} else if (e instanceof IOException 
+						|| e instanceof JSONCodecException 
+						|| e instanceof NumberFormatException) 
+				{
 					Log.info("received '" + e.toString() + "' (" + i + "/" + MAX_DOWNLOAD_ATTEMPTS + ")");
 					return;
 				} else {
@@ -44,9 +51,6 @@ public class UpdateServer {
 
 	}
 
-	public static final String PRIMARY_UPDATE_URL   = "http://lifeinthewoods.ca/litwr/repository";
-	public static final String SECONDARY_UPDATE_URL = "http://homac.cakelab.org/projects/litwrl/repository";
-	
 	private static final int CONNECT_TIMEOUT_MULTIPLIER  = 2;
 	private static final int READ_TIMEOUT                = 10000; // timeout on read
 	private static final int CONNECT_TIMEOUT             = READ_TIMEOUT * CONNECT_TIMEOUT_MULTIPLIER; // timeout on connect and read

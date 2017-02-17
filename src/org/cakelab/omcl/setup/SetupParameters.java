@@ -16,8 +16,9 @@ public class SetupParameters {
 	public String version;
 	public boolean keepVersion;
 	public String javaArgs;
-	public String shader;
 	public String[] optionals;
+
+	public String shader;
 
 	public SetupParameters(GameConfig gameConfig, File workdir, File gamedir,
 			String version, boolean keepVersion, GameTypes type, String javaArgs, String shader, String[] optionals) {
