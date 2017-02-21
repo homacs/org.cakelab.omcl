@@ -2,10 +2,12 @@
 <classpath>
 	<classpathentry excluding="org/cakelab/omcl/plugins/forge/v10_13_2_1230/migrates/|org/cakelab/omcl/plugins/forge/v10_13_4_1614/migrates/" kind="src" path="src"/>
 	<classpathentry kind="src" path="src-jnbt"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.cakelab.json"/>
-	<classpathentry kind="lib" path="libs/launcher.jar"/>
-	<classpathentry kind="lib" path="libs/Minecraft.jar"/>
-	<classpathentry kind="lib" path="libs/forge-1.10.2-12.18.3.2185-installer.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/java-7-oracle"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.cakelab.json"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/OpenMCL-Tools-trunk"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/OpenMCL-ForgeInstPlugin-1.5"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/OpenMCL-ForgeInstPlugin-10.13.2"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/OpenMCL-ForgeInstPlugin-10.13.4"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/java-8-oracle"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/OpenMCL-ForgeInstPlugin-1.4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

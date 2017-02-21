@@ -69,8 +69,12 @@ public class LauncherServicesStub extends ServicesStubBase {
 		URLClassLoader classLoader = null;
 		if (launcherJar.exists()) {
 			try {
-				classLoader = createURLClassLoader(launcherJar, new String[]{SERVICES_PACKAGE});
+				classLoader = createURLClassLoader(LauncherServicesStub.class, launcherJar, new String[]{SERVICES_PACKAGE});
 				enterPluginContext(classLoader);
+				
+//				// FIXME remove test code
+//				Class<?> origLauncher = classLoader.loadClass("net.minecraft.launcher.Launcher");
+//				
 				
 				Class<?> launcherClass = classLoader.loadClass(className);
 				

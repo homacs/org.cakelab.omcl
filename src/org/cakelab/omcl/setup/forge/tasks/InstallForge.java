@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.cakelab.omcl.gui.GUI;
 import org.cakelab.omcl.plugins.PluginServices;
 import org.cakelab.omcl.plugins.StubException;
+import org.cakelab.omcl.plugins.forge.ForgeServiceFactory;
 import org.cakelab.omcl.plugins.forge.ForgeServicesStub;
 import org.cakelab.omcl.plugins.minecraft.LauncherServicesStub;
 import org.cakelab.omcl.setup.minecraft.MinecraftBootstrap;
@@ -102,7 +103,7 @@ public class InstallForge extends RunnableTask {
 		//
 		// now we can install forge.
 		//
-		ForgeServicesStub forge = ForgeServicesStub.create(new File(this.installer), forgeVersion, PluginServices.getListener());
+		ForgeServicesStub forge = ForgeServiceFactory.create(new File(this.installer), forgeVersion, PluginServices.getListener());
 		boolean success = forge.installClient(new File(this.workingDir));
 		if (!success) {
 			throw new RuntimeException("Forge installation failed.");

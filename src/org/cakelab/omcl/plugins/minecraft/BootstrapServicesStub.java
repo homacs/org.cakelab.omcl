@@ -35,7 +35,7 @@ public class BootstrapServicesStub extends ServicesStubBase {
 		URLClassLoader classLoader = null;
 		if (bootstrapJar.exists()) {
 			try {
-				classLoader = createURLClassLoader(bootstrapJar, new String[]{SERVICES_PACKAGE});
+				classLoader = createURLClassLoader(BootstrapServicesStub.class, bootstrapJar, new String[]{SERVICES_PACKAGE});
 				enterPluginContext(classLoader);
 				
 				Class<?> launcherClass = classLoader.loadClass(className);
