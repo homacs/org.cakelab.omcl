@@ -59,17 +59,30 @@ public class ServersDat extends NBTFile {
 
 
 
+	public void addServer(String ip, String name, String icon) {
+		Map<String, Tag> info = new HashMap<String, Tag>();
+		info.put("ip", new StringTag("ip", ip));
+		info.put("name", new StringTag("name", name));
+		info.put("icon", new StringTag("icon", icon));
+		addServer(info);
+	}
+
 	public void addServer(String ip, String name) {
 		Map<String, Tag> info = new HashMap<String, Tag>();
 		info.put("ip", new StringTag("ip", ip));
 		info.put("name", new StringTag("name", name));
+		addServer(info);
+	}
+
+
+	protected void addServer(Map<String, Tag> info) {
 		CompoundTag serverInfo = new CompoundTag("server", info);
 		ListTag serverList = (ListTag) root.getValue().get(PROPERTY_SERVERS);
 		serverList.getValue().add(serverInfo);
 		modified = true;
 	}
-
-
+	
+	
 	public void removeServer(String ip) {
 		int i = findServer(ip);
 		if (i >= 0) {

@@ -65,12 +65,25 @@ public class UpdateServerPool extends ArrayList<UpdateServer>{
 			connectThreads[i] = new ConnectThread(i, txadvisor);
 			connectThreads[i].start();
 		}
-		
+
 		for (ConnectThread t : connectThreads) {
 			UpdateServer connection = null;
 			try {
 				connection = t.getResult();
 				if (!connection.isOffline() && connection.getMinRevision() >= minRevision) {
+					minRevision = connection.getMinRevision();
+				}
+			} catch (InterruptedException e) {
+				// ignore, probably shutting down
+			};
+		}
+		
+
+		for (ConnectThread t : connectThreads) {
+			UpdateServer connection = null;
+			try {
+				connection = t.getResult();
+				if (!connection.isOffline() && connection.getMinRevision() == minRevision) {
 					add(connection);
 				}
 			} catch (InterruptedException e) {
