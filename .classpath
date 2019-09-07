@@ -3,7 +3,7 @@
 	<classpathentry excluding="org/cakelab/omcl/plugins/forge/v10_13_2_1230/migrates/|org/cakelab/omcl/plugins/forge/v10_13_4_1614/migrates/" kind="src" path="src"/>
 	<classpathentry kind="src" path="src-jnbt"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/org.cakelab.json"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/OpenMCL-Tools-trunk"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/OpenMCL-Tools"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/OpenMCL-ForgeInstPlugin-1.5"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/OpenMCL-ForgeInstPlugin-10.13.2"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/OpenMCL-ForgeInstPlugin-10.13.4"/>
